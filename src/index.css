@@ -1,0 +1,16 @@
+@import url('/src/assets/plugins/sweetalert2/sweetalert.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+html,
+body {
+  @apply font-sans h-full text-[14px] bg-[#e7e8f3] leading-6
+}
+
+#root {
+  @apply h-full
+}
