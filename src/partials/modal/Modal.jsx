@@ -22,6 +22,8 @@ const schemaContact = yup
 function Modal({ visible, onHide, values }) {
   const queryClient = useQueryClient();
 
+  const params = new URLSearchParams(window.location.search);
+
   let BrowserId = Cookies.get("browserId");
 
   const { handleSubmit, control, reset, setValue } = useForm({
@@ -102,13 +104,21 @@ function Modal({ visible, onHide, values }) {
                   <div className="text-[18px] leading-8 md:text-[24px] md:leading-[36px] uppercase font-medium">
                     {values.option}
                   </div>
-                  {/* <div className="absolute left-0 w-full text-center bottom-8">
-                    HSD : 14 ngày
-                  </div> */}
+                  {params.get("EndDate") && (
+                    <div className="absolute left-0 w-full text-center bottom-8">
+                      HSD :
+                      <span className="pl-1">
+                        {moment(params.get("EndDate"), "DD-MM-YYYY").format(
+                          "DD-MM-YYYY"
+                        )}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="px-10 pt-10 pb-8 text-center">
-                  Quý khách liên hệ hotline <span className="text-primary">0375474333</span> và qua địa chỉ 350 Bà Triệu để
-                  nhận phần quà!
+                  Quý khách liên hệ hotline{" "}
+                  <span className="text-primary">0375474333</span> và qua địa
+                  chỉ 350 Bà Triệu để nhận phần quà!
                 </div>
                 {/* <div className="px-8 pt-10 pb-8 md:px-14">
                   <div className="relative">
