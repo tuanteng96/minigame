@@ -3,7 +3,6 @@ import Wheels from "@/pages/Wheels";
 import {
   BrowserRouter,
   Navigate,
-  Outlet,
   Route,
   Routes,
 } from "react-router-dom";
@@ -13,8 +12,9 @@ import { lazy } from "react";
 const Wheel1Page = lazy(() => import("@/pages/Wheels/Wheel1/Wheel1"));
 const Preview1Page = lazy(() => import("@/pages/Wheels/Wheel1/Preview1"));
 const WheelViewPage = lazy(() => import("@/pages/Views/WheelView"));
+const LuckyGiftBoxPage = lazy(() => import("@/pages/LuckyGiftBox"));
 
-function AppRoutes(props) {
+function AppRoutes() {
   return (
     <BrowserRouter basename="/minigame/">
       <Routes>
@@ -42,7 +42,7 @@ function AppRoutes(props) {
             </Route>
           </Route>
           <Route path="vong-quay-may-man" element={<WheelViewPage />} />
-          <Route path="hop-qua" element={<div>Hộp quà</div>} />
+          <Route path="hop-qua" element={<LuckyGiftBoxPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -4,13 +4,13 @@ import { PathHelper } from "@/helpers";
 import { Modal } from "@/partials/modal";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useWindowSize } from "@uidotdev/usehooks";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import axios from "axios";
 import moment from "moment";
 
-function WheelViewPage(props) {
+function WheelViewPage() {
   const [width, setWidth] = useState(550);
   const [data, setData] = useState({
     items: [
@@ -311,7 +311,7 @@ function WheelViewPage(props) {
         },
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           checkAuth.refetch();
         },
       }
@@ -326,7 +326,6 @@ function WheelViewPage(props) {
     buttonImage,
     arrowImage,
     layoutBackground,
-    logo,
   } = data;
 
   return (
