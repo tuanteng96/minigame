@@ -355,7 +355,7 @@ function WheelViewPage(props) {
             backgroundSounding={backgroundSounding}
             winnerSounding={winnerSounding}
             spinDuration={5000}
-            //spinDisabled={checkAuth?.data}
+            spinDisabled={checkAuth?.data}
             alerDisabled={() => {
               Swal.fire({
                 title: "Hết lượt quay !",

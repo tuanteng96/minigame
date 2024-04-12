@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ContactAPI } from "@/api";
 import Swal from "sweetalert2";
 import Cookies from "js-cookie";
+import moment from "moment";
 
 const schemaContact = yup
   .object({
@@ -82,7 +83,7 @@ function Modal({ visible, onHide, values }) {
               exit={{ opacity: 0, y: "100%" }}
             >
               <form
-                className="relative p-5 bg-white rounded-lg shadow dark:bg-gray-700"
+                className="relative p-5 bg-white rounded-lg shadow"
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <div className="absolute -top-[20px] left-2/4 -translate-x-2/4 w-[260px] z-20">
