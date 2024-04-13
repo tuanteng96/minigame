@@ -18,6 +18,15 @@ export default {
                 danger: '#f64e60',
                 "danger-hover": '#EE2D41',
                 muted: "#B5B5C3"
+            },
+            animation: {
+                'bounce2': 'bounce2 1.5s infinite',
+            },
+            keyframes: {
+                bounce2: {
+                    '0%, 100%': { transform: 'translateY(10px)', animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)" },
+                    '50%': { transform: 'translateY(0)', animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)" },
+                }
             }
         },
     },
