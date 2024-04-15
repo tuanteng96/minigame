@@ -274,14 +274,14 @@ function WheelViewPage() {
   useEffect(() => {
     setData((prevState) => ({
       ...prevState,
-      items: PrizeJson?.data || [],
+      items: PrizeJson?.data?.data || [],
     }));
   }, [PrizeJson?.data]);
 
   const sendMutation = useMutation({
     mutationFn: (body) => ContactAPI.send(body),
   });
-  
+
   const onSumbit = (values) => {
     sendMutation.mutate(
       {
@@ -296,18 +296,19 @@ function WheelViewPage() {
           Type: "contact",
           StockID: window?.Info?.ByStockID || "",
           DepartmentID: params.get("DepartmentID") || 0,
-          EndDate: params.get("EndDate")
+          EndDate: moment(params.get("EndDate"), "DD-MM-YYYY", true).isValid()
             ? moment(params.get("EndDate"), "DD-MM-YYYY")
                 .set({
                   hours: "23",
                   minutes: "59",
                 })
                 .format("HH:mm YYYY-MM-DD")
-            : moment("01-01-2099", "DD-MM-YYYY")
+            : moment()
                 .set({
                   hours: "23",
                   minutes: "59",
                 })
+                .add(Number(params.get("EndDate") || 7), "days")
                 .format("HH:mm YYYY-MM-DD"),
         },
       },
@@ -355,11 +356,13 @@ function WheelViewPage() {
             backgroundSounding={backgroundSounding}
             winnerSounding={winnerSounding}
             spinDuration={5000}
-            spinDisabled={checkAuth?.data}
+            spinDisabled={
+              PrizeJson?.data?.unlimitedTurns ? false : checkAuth?.data
+            }
             alerDisabled={() => {
               Swal.fire({
                 title: "Hết lượt quay !",
-                text: "Mỗi thành viên chỉ được quay 1 lượt duy nhất.",
+                text: "Mỗi khách hàng chỉ được quay 1 lượt duy nhất.",
                 icon: "error",
               });
             }}
@@ -387,7 +390,11 @@ function WheelViewPage() {
           ứng.
         </div>
         <div className="text-center">
-          Khách hàng chỉ có 1 lượt quay duy nhất.
+          Khách hàng có
+          <span className="px-1">
+            {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
+          </span>
+          lượt quay.
         </div>
       </div>
       <Modal
@@ -397,6 +404,7 @@ function WheelViewPage() {
           setSpinActive(null);
           setVisible(false);
         }}
+        PrizeJson={PrizeJson}
       />
     </div>
   );

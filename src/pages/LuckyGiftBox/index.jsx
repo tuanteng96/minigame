@@ -7,6 +7,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { BannersAPI, ContactAPI } from "@/api";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 var colors = new Array(
   [94, 114, 228],
@@ -131,11 +132,18 @@ function LuckyGiftBoxPage() {
   });
 
   useEffect(() => {
-    setData(PrizeJson?.data);
+    setData(PrizeJson?.data?.data);
   }, [PrizeJson?.data]);
 
   const openGift = () => {
-    if (checkAuth?.data) return;
+    if (!PrizeJson?.data?.unlimitedTurns && checkAuth?.data) {
+      Swal.fire({
+        title: "Hết lượt mở !",
+        text: "Mỗi khách hàng chỉ được mở 1 lần duy nhất.",
+        icon: "error",
+      });
+      return;
+    }
 
     setOpen(true);
     openAudio.play();
@@ -178,18 +186,19 @@ function LuckyGiftBoxPage() {
           Type: "contact",
           StockID: window?.Info?.ByStockID || "",
           DepartmentID: params.get("DepartmentID") || 0,
-          EndDate: params.get("EndDate")
+          EndDate: moment(params.get("EndDate"), "DD-MM-YYYY", true).isValid()
             ? moment(params.get("EndDate"), "DD-MM-YYYY")
                 .set({
                   hours: "23",
                   minutes: "59",
                 })
                 .format("HH:mm YYYY-MM-DD")
-            : moment("01-01-2099", "DD-MM-YYYY")
+            : moment()
                 .set({
                   hours: "23",
                   minutes: "59",
                 })
+                .add(Number(params.get("EndDate") || 7), "days")
                 .format("HH:mm YYYY-MM-DD"),
         },
       },
@@ -366,7 +375,7 @@ function LuckyGiftBoxPage() {
               type="button"
               onClick={openGift}
             >
-              {checkAuth?.data ? (
+              {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? (
                 <>
                   <span className="mr-2 last:mr-0">Hết</span>
                   <span className="mr-2 last:mr-0">lượt</span>
@@ -396,9 +405,18 @@ function LuckyGiftBoxPage() {
         </div>
       </div>
       <div className="text-center text-white text-sm py-5">
-        Khách hàng chỉ có {checkAuth?.data ? "0" : "1"} lượt quay duy nhất
+        Khách hàng có
+        <span className="px-1">
+          {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
+        </span>
+        lượt mở hộp quà.
       </div>
-      <PrizeWinnerModal visible={visible} prize={prize} onHide={onHide} />
+      <PrizeWinnerModal
+        visible={visible}
+        prize={prize}
+        onHide={onHide}
+        PrizeJson={PrizeJson}
+      />
     </div>
   );
 }

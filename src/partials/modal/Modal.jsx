@@ -20,7 +20,7 @@ const schemaContact = yup
   })
   .required();
 
-function Modal({ visible, onHide, values }) {
+function Modal({ visible, onHide, values,PrizeJson }) {
   const queryClient = useQueryClient();
 
   const params = new URLSearchParams(window.location.search);
@@ -42,6 +42,7 @@ function Modal({ visible, onHide, values }) {
 
   useEffect(() => {
     setValue("Content", values?.option || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values]);
 
   const sendMutation = useMutation({
@@ -117,9 +118,7 @@ function Modal({ visible, onHide, values }) {
                   )}
                 </div>
                 <div className="px-10 pt-10 pb-8 text-center">
-                  Quý khách liên hệ hotline{" "}
-                  <span className="text-primary">0375474333</span> và qua địa
-                  chỉ 350 Bà Triệu để nhận phần quà!
+                  {PrizeJson?.data?.copyrightWinner}
                 </div>
                 {/* <div className="px-8 pt-10 pb-8 md:px-14">
                   <div className="relative">

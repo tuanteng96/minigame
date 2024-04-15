@@ -2,8 +2,11 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PathHelper } from "@/helpers";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import moment from "moment";
 
-function PrizeWinnerModal({ visible, onHide, prize }) {
+function PrizeWinnerModal({ visible, onHide, prize, PrizeJson }) {
+  const params = new URLSearchParams(window.location.search);
+
   return (
     <AnimatePresence initial={false} mode="wait">
       {visible && (
@@ -58,14 +61,33 @@ function PrizeWinnerModal({ visible, onHide, prize }) {
                     alt=""
                   />
                   <div className="absolute bg-white rounded text-[#fd9426] px-4 py-2 font-medium bottom-0 overflow-hidden">
-                    HSD : 25-05-2024
+                    HSD :
+                    <span className="pl-1">
+                      {moment(
+                        params.get("EndDate"),
+                        "DD-MM-YYYY",
+                        true
+                      ).isValid()
+                        ? moment(params.get("EndDate"), "DD-MM-YYYY")
+                            .set({
+                              hours: "23",
+                              minutes: "59",
+                            })
+                            .format("HH:mm DD-MM-YYYY")
+                        : moment()
+                            .set({
+                              hours: "23",
+                              minutes: "59",
+                            })
+                            .add(Number(params.get("EndDate") || 7), "days")
+                            .format("DD-MM-YYYY")}
+                    </span>
                     <div className="w-3 h-3 absolute bg-black/90 rounded-full -left-1.5 top-2/4 -translate-y-2/4"></div>
                     <div className="w-3 h-3 absolute bg-black/90 rounded-full -right-1.5 top-2/4 -translate-y-2/4"></div>
                   </div>
                 </div>
                 <div className="text-white text-[13px] text-center px-5 mt-4">
-                  Quý khách hàng tới Spa hoặc Hotline: 0981.883.338 để nhận giải
-                  thưởng và đăng ký đặt lịch.
+                  {PrizeJson?.data?.copyrightWinner}
                 </div>
               </div>
             </motion.div>
