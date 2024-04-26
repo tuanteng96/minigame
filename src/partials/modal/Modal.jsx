@@ -20,7 +20,7 @@ const schemaContact = yup
   })
   .required();
 
-function Modal({ visible, onHide, values,PrizeJson }) {
+function Modal({ visible, onHide, values, PrizeJson }) {
   const queryClient = useQueryClient();
 
   const params = new URLSearchParams(window.location.search);
@@ -106,16 +106,29 @@ function Modal({ visible, onHide, values,PrizeJson }) {
                   <div className="text-[18px] leading-8 md:text-[24px] md:leading-[36px] uppercase font-medium">
                     {values.option}
                   </div>
-                  {params.get("EndDate") && (
-                    <div className="absolute left-0 w-full text-center bottom-8">
-                      HSD :
-                      <span className="pl-1">
-                        {moment(params.get("EndDate"), "DD-MM-YYYY").format(
-                          "DD-MM-YYYY"
-                        )}
-                      </span>
-                    </div>
-                  )}
+                  <div className="absolute left-0 w-full text-center bottom-8">
+                    HSD :
+                    <span className="pl-1">
+                      {moment(
+                        params.get("EndDate"),
+                        "DD-MM-YYYY",
+                        true
+                      ).isValid()
+                        ? moment(params.get("EndDate"), "DD-MM-YYYY")
+                            .set({
+                              hours: "23",
+                              minutes: "59",
+                            })
+                            .format("DD-MM-YYYY")
+                        : moment()
+                            .set({
+                              hours: "23",
+                              minutes: "59",
+                            })
+                            .add(Number(params.get("EndDate") || 7), "days")
+                            .format("DD-MM-YYYY")}
+                    </span>
+                  </div>
                 </div>
                 <div className="px-10 pt-10 pb-8 text-center">
                   {PrizeJson?.data?.copyrightWinner}
