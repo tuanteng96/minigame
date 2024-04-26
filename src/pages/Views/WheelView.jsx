@@ -377,7 +377,7 @@ function WheelViewPage() {
         </div>
       </div>
       <div className="md:text-[18px] md:leading-9 md:absolute relative left-0 bottom-0 md:left-14 w-full md:w-[550px] bg-[#bd0c21] text-white px-8 md:px-14 pt-16 md:pt-28 pb-5 md:pb-10 rounded-t-[25px]">
-        <div className="absolute -top-16 md:-top-20 w-[150px] md:w-[220px] left-2/4 -translate-x-2/4">
+        <div className="absolute w-auto -top-16 md:-top-20 left-2/4 -translate-x-2/4">
           <img
             className="w-full"
             src={PathHelper.toAbsolutePath("assets/12/TITLE.png")}
