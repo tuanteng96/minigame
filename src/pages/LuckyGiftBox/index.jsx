@@ -124,10 +124,34 @@ function LuckyGiftBoxPage() {
   const PrizeJson = useQuery({
     queryKey: ["PrizeJson"],
     queryFn: async () => {
-      let { data } = await axios.get(
-        import.meta.env.BASE_URL + "assets/json/gift.json"
+      let rs = null;
+      let { data: dataRs } = await axios.get(
+        PathHelper.toAbsoluteServer(
+          `/api/gl/select2?cmd=art&includeSource=1&channels=11609`
+        )
       );
-      return data || [];
+
+      let newDataRs = dataRs.data
+        ? dataRs.data.filter((x) => x?.source?.IsPublic)
+        : [];
+      if (newDataRs && newDataRs.length > 0) {
+        if (newDataRs[0].source?.Content) {
+          rs = newDataRs[0].source?.Content
+            ? {
+                ...JSON.parse(newDataRs[0].source?.Content),
+                Name: newDataRs[0]?.text.split(";")?.[2],
+              }
+            : null;
+        }
+      }
+      if (!rs) {
+        let { data } = await axios.get(
+          PathHelper.toAbsoluteServer("/brand/minigame/assets/json/prize.json")
+        );
+
+        rs = { ...data };
+      }
+      return rs;
     },
   });
 
@@ -176,7 +200,7 @@ function LuckyGiftBoxPage() {
     sendMutation.mutate(
       {
         contact: {
-          Title: BrandGift,
+          Title: PrizeJson?.data?.Name || BrandGift,
           Fullname: window?.Info?.FullName || "",
           Phone1: window?.Info?.MobilePhone || "",
           Content: values?.option || "",
@@ -186,8 +210,15 @@ function LuckyGiftBoxPage() {
           Type: "contact",
           StockID: window?.Info?.ByStockID || "",
           DepartmentID: params.get("DepartmentID") || 0,
-          EndDate: moment(params.get("EndDate"), "DD-MM-YYYY", true).isValid()
-            ? moment(params.get("EndDate"), "DD-MM-YYYY")
+          EndDate: moment(
+            PrizeJson?.data?.ExpiredDate || params.get("EndDate"),
+            "DD-MM-YYYY",
+            true
+          ).isValid()
+            ? moment(
+                PrizeJson?.data?.ExpiredDate || params.get("EndDate"),
+                "DD-MM-YYYY"
+              )
                 .set({
                   hours: "23",
                   minutes: "59",
@@ -198,7 +229,12 @@ function LuckyGiftBoxPage() {
                   hours: "23",
                   minutes: "59",
                 })
-                .add(Number(params.get("EndDate") || 7), "days")
+                .add(
+                  Number(
+                    PrizeJson?.data?.ExpiredDate || params.get("EndDate") || 7
+                  ),
+                  "days"
+                )
                 .format("HH:mm YYYY-MM-DD"),
         },
       },
@@ -212,7 +248,7 @@ function LuckyGiftBoxPage() {
 
   return (
     <div
-      className="h-full bg-no-repeat bg-cover flex flex-col relative"
+      className="relative flex flex-col h-full bg-no-repeat bg-cover"
       style={{
         backgroundImage: `url(${PathHelper.toAbsolutePath(
           "assets/lucky-gift-box/bg.png"
@@ -356,7 +392,7 @@ function LuckyGiftBoxPage() {
         </div>
       </div>
       <div className="grow">
-        <div className="pl-7 pr-10 mt-10">
+        <div className="pr-10 mt-10 pl-7">
           <img
             src={PathHelper.toAbsolutePath("assets/lucky-gift-box/title.png")}
             alt=""
@@ -367,9 +403,9 @@ function LuckyGiftBoxPage() {
             <div>
               Bấm <span className="text-2xl font-bold">"Mở Hộp Quà"</span>
             </div>
-            <div>để tìm kiếm giải thưởng may mắn của bản</div>
+            <div>để tìm kiếm giải thưởng may mắn của bạn</div>
           </div>
-          <div className="text-center mt-4">
+          <div className="mt-4 text-center">
             <button
               className="pt-3 py-2.5 px-8 rounded-3xl font-bold capitalize text-white btn-gift"
               type="button"
@@ -391,11 +427,11 @@ function LuckyGiftBoxPage() {
             </button>
           </div>
         </div>
-        <div className="text-center mt-8">
+        <div className="mt-8 text-center">
           <PrizePicker data={data}>
             {({ open }) => (
               <div
-                className="text-white cursor-pointer underline font-semibold"
+                className="font-semibold text-white underline cursor-pointer"
                 onClick={open}
               >
                 Danh sách giải thưởng
@@ -404,13 +440,16 @@ function LuckyGiftBoxPage() {
           </PrizePicker>
         </div>
       </div>
-      <div className="text-center text-white text-sm py-5">
-        Khách hàng có
-        <span className="px-1">
-          {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
-        </span>
-        lượt mở hộp quà.
-      </div>
+      {!PrizeJson?.data?.unlimitedTurns && (
+        <div className="py-5 text-sm text-center text-white">
+          Khách hàng có
+          <span className="px-1">
+            {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
+          </span>
+          lượt mở hộp quà.
+        </div>
+      )}
+
       <PrizeWinnerModal
         visible={visible}
         prize={prize}

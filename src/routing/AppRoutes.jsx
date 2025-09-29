@@ -13,6 +13,8 @@ const Wheel1Page = lazy(() => import("@/pages/Wheels/Wheel1/Wheel1"));
 const Preview1Page = lazy(() => import("@/pages/Wheels/Wheel1/Preview1"));
 const WheelViewPage = lazy(() => import("@/pages/Views/WheelView"));
 const LuckyGiftBoxPage = lazy(() => import("@/pages/LuckyGiftBox"));
+const GiftBoxIdPage = lazy(() => import("@/pages/GiftBoxId"));
+const RotationLuckId = lazy(() => import("@/pages/RotationLuckId"));
 
 function AppRoutes() {
   return (
@@ -41,8 +43,10 @@ function AppRoutes() {
               />
             </Route>
           </Route>
+          <Route path="vong-quay" element={<RotationLuckId />} />
           <Route path="vong-quay-may-man" element={<WheelViewPage />} />
           <Route path="hop-qua" element={<LuckyGiftBoxPage />} />
+          <Route path="hop-qua-bi-an" element={<GiftBoxIdPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

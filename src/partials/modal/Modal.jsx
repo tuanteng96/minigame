@@ -94,10 +94,10 @@ function Modal({ visible, onHide, values, PrizeJson }) {
                     alt=""
                   />
                 </div>
-                <div className="bg-[#bd0c21] rounded-t-[0.5rem] text-white text-center px-12 pt-14 pb-20 rounded-b-[50%] relative">
+                <div className="bg-[var(--color-bg)] rounded-t-[0.5rem] text-white text-center px-12 pt-14 pb-20 rounded-b-[50%] relative">
                   <div className="px-10 mb-3">
                     <div className="relative flex justify-center">
-                      <div className="relative z-20 bg-[#bd0c21] px-3 font-light text-[14px]">
+                      <div className="relative z-20 bg-[var(--color-bg)] px-3 font-light text-[14px]">
                         Bạn nhận được
                       </div>
                       <div className="absolute bottom-[6px] w-full h-[1px] bg-white"></div>
@@ -246,7 +246,7 @@ function Modal({ visible, onHide, values, PrizeJson }) {
                     type="button"
                     onClick={onHide}
                     className={clsx(
-                      "bg-[#bd0c21] text-white uppercase rounded-full w-[100px] h-[48px] font-semibold relative transition",
+                      "bg-[var(--color-bg)] text-white uppercase rounded-full w-[100px] h-[48px] font-semibold relative transition",
                       sendMutation.isLoading ? "opacity-80" : "opacity-100"
                     )}
                   >

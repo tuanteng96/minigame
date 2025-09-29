@@ -9,6 +9,8 @@ import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import axios from "axios";
 import moment from "moment";
+import clsx from "clsx";
+import { PrizePicker } from "../LuckyGiftBox/components";
 
 function WheelViewPage() {
   const [width, setWidth] = useState(550);
@@ -264,18 +266,49 @@ function WheelViewPage() {
   const PrizeJson = useQuery({
     queryKey: ["PrizeJson"],
     queryFn: async () => {
-      let { data } = await axios.get(
-        import.meta.env.BASE_URL + "assets/json/prize.json"
+      let rs = null;
+      let { data: dataRs } = await axios.get(
+        PathHelper.toAbsoluteServer(
+          `/api/gl/select2?cmd=art&includeSource=1&channels=11609`
+        )
       );
-      return data || [];
+
+      let newDataRs = dataRs.data
+        ? dataRs.data.filter((x) => x?.source?.IsPublic)
+        : [];
+      if (newDataRs && newDataRs.length > 0) {
+        if (newDataRs[0].source?.Content) {
+          rs = newDataRs[0].source?.Content
+            ? {
+                ...JSON.parse(newDataRs[0].source?.Content),
+                Name: newDataRs[0]?.text.split(";")?.[2],
+              }
+            : null;
+        }
+      }
+      if (!rs) {
+        let { data } = await axios.get(
+          PathHelper.toAbsoluteServer("/brand/minigame/assets/json/prize.json")
+        );
+
+        rs = { ...data };
+      }
+      return rs;
     },
   });
 
   useEffect(() => {
     setData((prevState) => ({
       ...prevState,
-      items: PrizeJson?.data?.data || [],
+      items: PrizeJson?.data?.data
+        ? PrizeJson?.data?.data?.map((x) => ({ ...x, visible: false }))
+        : [],
     }));
+
+    document.documentElement.style.setProperty(
+      "--color-bg",
+      PrizeJson?.data?.color || "#bd0c21"
+    );
   }, [PrizeJson?.data]);
 
   const sendMutation = useMutation({
@@ -286,7 +319,7 @@ function WheelViewPage() {
     sendMutation.mutate(
       {
         contact: {
-          Title: BrandVQMM,
+          Title: PrizeJson?.data?.Name || BrandVQMM,
           Fullname: window?.Info?.FullName || "",
           Phone1: window?.Info?.MobilePhone || "",
           Content: values?.option || "",
@@ -295,9 +328,16 @@ function WheelViewPage() {
           Status: "0",
           Type: "contact",
           StockID: window?.Info?.ByStockID || "",
-          DepartmentID: params.get("DepartmentID") || 0,
-          EndDate: moment(params.get("EndDate"), "DD-MM-YYYY", true).isValid()
-            ? moment(params.get("EndDate"), "DD-MM-YYYY")
+          DepartmentID: params.get("DepartmentID") || 22,
+          EndDate: moment(
+            PrizeJson?.data?.ExpiredDate || params.get("EndDate"),
+            "DD-MM-YYYY",
+            true
+          ).isValid()
+            ? moment(
+                PrizeJson?.data?.ExpiredDate || params.get("EndDate"),
+                "DD-MM-YYYY"
+              )
                 .set({
                   hours: "23",
                   minutes: "59",
@@ -308,7 +348,12 @@ function WheelViewPage() {
                   hours: "23",
                   minutes: "59",
                 })
-                .add(Number(params.get("EndDate") || 7), "days")
+                .add(
+                  Number(
+                    PrizeJson?.data?.ExpiredDate || params.get("EndDate") || 7
+                  ),
+                  "days"
+                )
                 .format("HH:mm YYYY-MM-DD"),
         },
       },
@@ -332,7 +377,7 @@ function WheelViewPage() {
 
   return (
     <div
-      className="w-full min-h-full md:h-full !bg-no-repeat !bg-cover flex flex-col"
+      className="w-full min-h-full md:h-full !bg-no-repeat !bg-cover flex flex-col !bg-center"
       style={{ background: `url(${layoutBackground})` }}
     >
       <div className="grow">
@@ -376,7 +421,11 @@ function WheelViewPage() {
           />
         </div>
       </div>
-      <div className="md:text-[18px] md:leading-9 md:absolute relative left-0 bottom-0 md:left-14 w-full md:w-[550px] bg-[#bd0c21] text-white px-8 md:px-14 pt-16 md:pt-28 pb-5 md:pb-10 rounded-t-[25px]">
+      <div
+        className={clsx(
+          "md:text-[18px] md:leading-9 md:absolute relative left-0 bottom-0 md:left-14 w-full md:w-[550px] text-white px-8 md:px-14 pt-16 md:pt-28 pb-5 md:pb-10 rounded-t-[25px] bg-[var(--color-bg)]"
+        )}
+      >
         <div className="absolute w-auto -top-16 md:-top-20 left-2/4 -translate-x-2/4">
           <img
             className="w-full"
@@ -389,13 +438,27 @@ function WheelViewPage() {
           trí mũi tên khi vòng quay kết thúc bạn sẽ nhận được giải thưởng tương
           ứng.
         </div>
-        <div className="text-center">
-          Khách hàng có
-          <span className="px-1">
-            {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
-          </span>
-          lượt quay.
+        <div className="mt-5 text-center">
+          <PrizePicker data={PrizeJson?.data?.data}>
+            {({ open }) => (
+              <div
+                className="font-semibold text-white underline cursor-pointer"
+                onClick={open}
+              >
+                Danh sách giải thưởng
+              </div>
+            )}
+          </PrizePicker>
         </div>
+        {!PrizeJson?.data?.unlimitedTurns && (
+          <div className="text-center">
+            Khách hàng có
+            <span className="px-1">
+              {!PrizeJson?.data?.unlimitedTurns && checkAuth?.data ? "0" : "1"}
+            </span>
+            lượt quay.
+          </div>
+        )}
       </div>
       <Modal
         values={spinActive}

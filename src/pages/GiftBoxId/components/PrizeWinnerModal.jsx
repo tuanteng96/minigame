@@ -5,21 +5,19 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import moment from "moment";
 
 function PrizeWinnerModal({ visible, onHide, prize, PrizeJson }) {
-  const params = new URLSearchParams(window.location.search);
-
   return (
     <AnimatePresence initial={false} mode="wait">
       {visible && (
         <>
-          <div className="fixed top-0 left-0 right-0 z-50 flex items-end justify-center h-full max-h-full overflow-x-hidden overflow-y-auto md:items-center md:inset-0">
+          <div className="fixed top-0 left-0 right-0 z-50 flex items-end justify-center h-full max-h-full overflow-x-hidden overflow-y-auto md:items-center md:inset-0 bg-black/85">
             <motion.div
-              className="relative w-full md:max-w-[450px] h-full z-20 bg-black/85 shadow-xl flex flex-col justify-center"
+              className="relative w-full md:max-w-[450px] h-full z-20 shadow-xl flex flex-col justify-center"
               initial={{ opacity: 0, y: "100%" }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: "100%" }}
             >
               <div
-                className="absolute flex items-center justify-center w-12 h-12 text-white transition top-2 right-2 opacity-85 hover:opacity-100"
+                className="absolute flex items-center justify-center w-12 h-12 text-white transition cursor-pointer top-2 right-2 opacity-85 hover:opacity-100 md:hidden"
                 onClick={onHide}
               >
                 <XMarkIcon className="w-9" />
@@ -64,44 +62,38 @@ function PrizeWinnerModal({ visible, onHide, prize, PrizeJson }) {
                     HSD :
                     <span className="pl-1">
                       {moment(
-                        PrizeJson?.data?.ExpiredDate || params.get("EndDate"),
-                        "DD-MM-YYYY",
+                        PrizeJson?.EndDate,
+                        "HH:mm DD-MM-YYYY",
                         true
                       ).isValid()
-                        ? moment(
-                            PrizeJson?.data?.ExpiredDate ||
-                              params.get("EndDate"),
-                            "DD-MM-YYYY"
+                        ? moment(PrizeJson?.EndDate, "HH:mm DD-MM-YYYY").format(
+                            "HH:mm DD-MM-YYYY"
                           )
+                        : PrizeJson?.EndDate
+                        ? moment()
                             .set({
                               hours: "23",
                               minutes: "59",
                             })
-                            .format("HH:mm DD-MM-YYYY")
-                        : moment()
-                            .set({
-                              hours: "23",
-                              minutes: "59",
-                            })
-                            .add(
-                              Number(
-                                PrizeJson?.data?.ExpiredDate ||
-                                  params.get("EndDate") ||
-                                  7
-                              ),
-                              "days"
-                            )
-                            .format("DD-MM-YYYY")}
+                            .add(Number(PrizeJson?.EndDate || 7), "days")
+                            .format("DD-MM-YYYY")
+                        : "Không giới hạn"}
                     </span>
                     <div className="w-3 h-3 absolute bg-black/90 rounded-full -left-1.5 top-2/4 -translate-y-2/4"></div>
                     <div className="w-3 h-3 absolute bg-black/90 rounded-full -right-1.5 top-2/4 -translate-y-2/4"></div>
                   </div>
                 </div>
                 <div className="text-white text-[13px] text-center px-5 mt-4">
-                  {PrizeJson?.data?.copyrightWinner}
+                  {PrizeJson?.footer}
                 </div>
               </div>
             </motion.div>
+            <div
+              className="absolute items-center justify-center hidden w-12 h-12 text-white transition cursor-pointer top-2 right-2 opacity-85 hover:opacity-100 md:flex"
+              onClick={onHide}
+            >
+              <XMarkIcon className="w-9" />
+            </div>
           </div>
         </>
       )}
